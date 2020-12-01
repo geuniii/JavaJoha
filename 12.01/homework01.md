@@ -158,7 +158,7 @@ public class Quiz03 {
 }
 ```
 
-# *Quiz01-2*
+## *Quiz01-2*
 ##### Quiz01 쓰레드로
 
 ```java
