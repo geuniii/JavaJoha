@@ -133,9 +133,9 @@ public class Quiz03 {
 					break;
 				}
 				
-				else {
+				
 					buf.append(string);
-				}
+				
 				
 			}					
 			
