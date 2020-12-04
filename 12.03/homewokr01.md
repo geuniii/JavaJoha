@@ -108,6 +108,97 @@ public class guiProject extends JFrame {
 		buttonArr.add( new MyButton("Americano",4000));
 		buttonArr.add( new MyButton("Cafe Latte",4500));
 		buttonArr.add( new MyButton("Cappuccino",4500));
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+
+
+/////////////////메뉴 버튼/////////////////////
+class MyButton extends JButton {
+	private String menuName;
+	private int price;
+
+	MyButton(String name, int price) {
+		super(name);
+		this.menuName =name;
+		this.price = price;
+		
+	}
+
+	public String getMenuName() {
+		return menuName;
+	}
+	public int getPrice() {
+		return price;
+	}
+
+}
+
+public class guiProject extends JFrame {
+    /////이벤트 리스너/////
+	ActionListener listener = new ActionListener() {
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(e.getSource()==buttonArr) {
+				//textArea.append(buttonArr.toString());
+				JOptionPane.showMessageDialog(null,"눌렸다!");
+			}
+		}
+	};
+
+
+	public guiProject() {
+		setTitle("Coffee Payment Project");
+		setSize(1200, 800);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
+		
+		/////패널 생성////
+
+		initNorthPanel();
+		add(northPanel, BorderLayout.NORTH);
+		
+		initWestPanel();
+		add(westPanel, BorderLayout.WEST);
+		
+		initCenterPanel();
+		add(centerPanel, BorderLayout.CENTER);
+		
+		initSouthPanel();
+		add(southPanel, BorderLayout.SOUTH);		
+
+	}
+
+    //////////////NorthPanel->기능버튼/////////////
+	private void initNorthPanel() {
+		northPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 20));
+		northPanel.add(save);
+		northPanel.add(load);
+		northPanel.add(pay);
+	}
+
+    //////////////WestPanel-> 메뉴버튼/////////////
+	private void initWestPanel() {
+		westPanel.setLayout(new GridLayout(5,1));
+		buttonArr.add( new MyButton("Americano",4000));
+		buttonArr.add( new MyButton("Cafe Latte",4500));
+		buttonArr.add( new MyButton("Cappuccino",4500));
 		buttonArr.add( new MyButton("vanilla Latte",5000));
 		buttonArr.add( new MyButton("caramel Macchiato",5000));
 
@@ -115,7 +206,8 @@ public class guiProject extends JFrame {
 			
 			westPanel.add(b);
 			b.addActionListener(e ->{
-				textArea.append(b.getMenuName()+" : "+b.getPrice()+"원 \n\n");
+				String timeStamp  = dateFormat.format(new Date());
+				textArea.append(b.getMenuName()+" : "+b.getPrice()+"원 "+" "+timeStamp+"\n\n");
 				System.out.println(b.getMenuName());
 			});
 			
@@ -132,16 +224,30 @@ public class guiProject extends JFrame {
     //////////////SouthPanel->총 금액&시간/////////////
 	private void initSouthPanel() {
 		southPanel.setLayout(new FlowLayout(FlowLayout.LEFT,50,20));
-		southPanel.add(label);
+		
+	for(MyButton b : buttonArr) {
+			b.addActionListener(e ->{
+				sum+=b.getPrice();
+				sumText.setText(Integer.toString(sum)+"원");
+			});
+			
+
+		}		
+	southPanel.add(label);
+	southPanel.add(sumText);
 		
 	}
 	
     ///////////////////Field/////////////////////
+	
+	SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+	
+	
 	private JTextArea textArea = new JTextArea(100,110);
 	
 	private JTextField timeText = new JTextField();
 	private JTextField sumText = new JTextField();
-	
+	int sum = 0;
 	private ArrayList<MyButton> buttonArr = new ArrayList<>();
 
 	private JLabel label = new JLabel("총 결제액:");
@@ -159,6 +265,8 @@ public class guiProject extends JFrame {
 		new guiProject();
 	}
 }
+
+
 ```
 
 
