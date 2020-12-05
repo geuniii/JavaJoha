@@ -67,7 +67,7 @@ public class guiProject extends JFrame {
 	
 	public guiProject() {
 		setTitle("Coffee Payment Project");
-		setSize(800, 600);
+		setSize(1200, 800);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -241,7 +241,6 @@ public class guiProject extends JFrame {
 		new guiProject();
 	}
 }
-
 ```
 
 
