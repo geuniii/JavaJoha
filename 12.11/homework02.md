@@ -34,7 +34,7 @@ public class homework02 {
 
 		loop: while (true) {
 			String input = JOptionPane.showInputDialog("조회할 포켓몬 입력! (종료 exit)");
-			if (input == "exit") {
+			if (input.equals("exit")) {
 				break loop;
 			}
 			String sql = "SELECT * FROM pokemon WHERE name ='" + input + "'";
@@ -74,4 +74,5 @@ public class homework02 {
 	}
 
 }
+
 ```
