@@ -7,7 +7,6 @@
 jdk 15.0.1
 ide : eclipse
 DB : mysql  Ver 8.0.20, MariaDB 10.5.8
-connector : mysql-connector-java-8.0.22
 
 주요 기능
 - 로그인, 회원가입
@@ -19,13 +18,20 @@ connector : mysql-connector-java-8.0.22
 - 사용자 랭킹 조회
 
 작품의 특장점
-
 - 멀티 스레딩으로 다양한 기능을 병렬적, 경제적 수행
-  * 단어 생성 스레드
-  * 진행된 정도 표시 스레드
-  * 정답 속도 타이머 스레드
+  * 진행된 정도 표시 스레드 / 정답 속도 타이머 스레드 /단어 생성 스레드 / 그래픽 repaint 스레드
   
+![스레드 구성](https://user-images.githubusercontent.com/62981623/103164973-427f6f80-4855-11eb-8c0d-888fbf562e73.jpg)
+
 - 더블 버퍼링으로 그래픽의 움직임을 부드럽게 표현
+  * 보이지 않는 화면을 하나 추가하여 버퍼 역할을 해주어 단어의 움직임을 끊김 없이 표현한다.
+```java
+  		Image offScreenImage = getParent().createImage(getSize().width, getSize().height);
+		Graphics offScreen = offScreenImage.getGraphics();
+```
+
+
+ 
 
 - 관계형 데이터베이스 활용을 통해 순위 조회, 기록 갱신
 
