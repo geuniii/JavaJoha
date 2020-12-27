@@ -31,45 +31,44 @@ DB : mysql  Ver 8.0.20, MariaDB 10.5.8
 ```
 
 - 관계형 데이터베이스 활용을 통해 순위 조회, 기록 갱신
-  * 레벨 별로 총 인원과, 사용자의 순위 조회로 랭킹을 보여주며, 최고 기록을 넘을 시 갱신한다.
+  * 레벨 별로 총 인원과, 사용자의 순위 조회로 랭킹을 보여준다.  
 ```java
-	public StringBuffer myRankSearch(String id, int rankNum) {
+String sql = "SELECT ID, rank() over(order by max_score DESC) from maxscore where level=?";
+```
+  * 게임이 끝난 후 점수가 사용자의 최고 기록을 넘을 시 점수를 갱신한다.
+```java
+public String maxScoreCheck(String id, int level, int score) {
 
-		Connection conn = null;
-		PreparedStatement p = null;
+		String sql = "SELECT max_score FROM maxscore WHERE ID =? AND level=?";
 		ResultSet rs = null;
-
-		String sql = "SELECT ID, rank() over(order by max_score DESC) from maxscore where level=?";
-
-		StringBuffer buf = new StringBuffer("<YOUR RANK>\n");
-		
-		String[] countArr = userCount();
-		String[] levelArr = new String[rankNum];
-		String[] rankArr = new String[rankNum];
-
-		for (int i = 0; i <rankNum; i++) {
-			int searchLevel = i + 1;
-			levelArr[i] = String.valueOf(searchLevel);
-			try {
-				p = (conn = getConnection()).prepareStatement(sql);
-				p.setInt(1, searchLevel);
-				rs = p.executeQuery();
-				while (rs.next()) {					
-					if (rs.getString(1).equals(id)) {						
-						rankArr[i] = String.valueOf(rs.getString(2));
-						break;
-					} else {
-						rankArr[i] = "X ";
-					}
+		PreparedStatement p = null;
+		Connection conn = null;
+		String returnMsg = null;
+		try {
+			p = (conn = getConnection()).prepareStatement(sql);			
+			p.setString(1, id);
+			p.setInt(2, level);
+			rs = p.executeQuery();
+			
+			if (rs.next()) {				
+				if (score >rs.getInt(1)) {
+					updateMaxScore(score,id, level);
+					returnMsg = "나의 최고 기록 갱신 성공!^__^";
+					return returnMsg;
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
+				returnMsg =  "나의 최고 기록 갱신 실패!T_T";
+				return returnMsg;
+			}			
+			else {
+				insertMaxScore(id, level, score);
+				returnMsg =  "나의 최초 기록 갱신 성공!^__^";
 			}
 
-			buf.append("level" + levelArr[i] + ":   " + rankArr[i] + "등 / " + countArr[i] + "명 \n");
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		close(conn, p, rs);
-		return buf;
+		return returnMsg;
 	}
 ```
 
@@ -97,39 +96,17 @@ DB에 meaning을 여러가지 넣었을 때, 사용자가 입력한 값이 있�
 상속받은 Frame들이 생성될 때마다 Audio Clip도 생성되는 문제가 생겼다.  
 --> 기존 Frame을 닫고 새로운 Frame을 생성할 때마다 clip.stop();을 통해 잠시 멈춘 후 멈춘 곳에서 다시 재생하게 하여 해결하였다.  
 
-개선방안
-- socket 통신을 통해 대결 기능 추가
-- 틀린 단어 단어장 추가
+개선방안 
 
-1) 이클립스에서 프로젝트를 깃에 바로 올리는 방법 
-  2) readme.md 추가 (도큐먼트 링크, 시연 동영상 유튜브 링크) 
-	ㄱ. 프로젝트 소개 (메인 주제) 
-	ㄷ. 사용한 api, ide 등의 버전 
-		예) 
-			JDK 1.8
-			IDE : 이클립스
-			Database : mysql 15.1, MariaDB 10.5.8
-					(cmd $mysql --version)
-			외부 라이브러리 : ~~~~
-	ㄴ. 잘한 점 
-		- 어떤 기능에 포커스를 두었는지 
-		- 기능 구현을 위해 어떤 새로운 공부를 했는지
-		- 설계를 어떻게 했는지 (아주 중요!!!) 
-		- .... 
-	ㄹ. 힘들었던 점 
-		- ~~~ 구현에 ~~~ 지식이 필요했는데 그 부분이 어려웠다. 
-		  그래서 이 부분을 ~~~~ 하여 해결했다.
-		- ~~~~ 하려고 했는데 ~~~ 한 이유로 쉽게 구현할 수 없었다.
-		  그래서 이 부분을 ~~~~ 하여 해결했다.
+- Socket 통신을 통해 대결 기능 추가  
+TCP/IP Socket 통신으로 1:1 대결 기능을 추가하고자 하였다. 문자열만 주고 받는 통신을 해서 WordItem 객체를 통신하는 방법이 필요하다.  
+Client에서 문자열을 주면 Server단에서 WordItem객체를 생성하도록 로직을 바꾸거나, WordItem 객체를 주고 받는 방법이 있다면 개선할 수 있다.  
 
-	ㄷ. 부족한 점 (개선해야 할 점) 
-		- ~~ 기능을 추가하려했으나 ~~~이유로 구현하지 못했다. 
-		  ~~~ 게 구현하면 될 것 (어떻게 개선할 것인가)
-		- 나는 ~~~~ 게 구현했는데, ~~~~ 방법도 좋을 것 같다.
-	ㅁ. 더 넣고 싶은 멘트가 있으면 추가
-	ㅂ. 동영상 링크(유튜브 외부 링크) 및 섬네일 
-<div>
-	<a href="https://www.youtube.com/watch?v=비디오id" target="_blank"><image src = "https://img.youtube.com/vi/비디오id/mqdefault.jpg"></a>	
+- 틀린 단어 단어장 추가  
+단어의 Y좌표 위치가 그래픽을 구현한 Panel의 높이를 벗어나면 HashMap에서 삭제하게 구현하였다. 이렇게 단순히 삭제되는 단어들을 DB에 vacabulary Table을  
+따로 생성하여 저장한다면 사용자만의 단어장을 만들어 오답 노트로 사용할 수 있도록 개선한다면 단어 암기에 더욱 도움되는 프로그램이 될 것이다.  
 
-</div>
-	ㅅ. Javadoc 링크(repo 내부 링크)
+- 단어끼리의 충돌시 그래픽 개선  
+단어가 랜덤하게 움직이는 동안 x좌표가 그래픽 Panel의 너비와 닿으면 반대 방향으로 움직이게 구현하였다. Panel의 너비뿐 만 아니라, 단어마다 폭을 구하여 부딪치면  
+반대 방향으로 움직이게 구현한다면 랜덤하게 움직이는 동안 단어들이 겹치는 현상을 개선할 수 있다.  
+
