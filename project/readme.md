@@ -30,18 +30,70 @@ DB : mysql  Ver 8.0.20, MariaDB 10.5.8
 		Graphics offScreen = offScreenImage.getGraphics();
 ```
 
-
- 
-
 - 관계형 데이터베이스 활용을 통해 순위 조회, 기록 갱신
+  * 레벨 별로 총 인원과, 사용자의 순위 조회로 랭킹을 보여주며, 최고 기록을 넘을 시 갱신한다.
+```java
+	public StringBuffer myRankSearch(String id, int rankNum) {
+
+		Connection conn = null;
+		PreparedStatement p = null;
+		ResultSet rs = null;
+
+		String sql = "SELECT ID, rank() over(order by max_score DESC) from maxscore where level=?";
+
+		StringBuffer buf = new StringBuffer("<YOUR RANK>\n");
+		
+		String[] countArr = userCount();
+		String[] levelArr = new String[rankNum];
+		String[] rankArr = new String[rankNum];
+
+		for (int i = 0; i <rankNum; i++) {
+			int searchLevel = i + 1;
+			levelArr[i] = String.valueOf(searchLevel);
+			try {
+				p = (conn = getConnection()).prepareStatement(sql);
+				p.setInt(1, searchLevel);
+				rs = p.executeQuery();
+				while (rs.next()) {					
+					if (rs.getString(1).equals(id)) {						
+						rankArr[i] = String.valueOf(rs.getString(2));
+						break;
+					} else {
+						rankArr[i] = "X ";
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			buf.append("level" + levelArr[i] + ":   " + rankArr[i] + "등 / " + countArr[i] + "명 \n");
+		}
+		close(conn, p, rs);
+		return buf;
+	}
+```
 
 문제점 및 해결방안 
 
-- GUI 이벤트 스레드의 중단 문제 (충돌)
- 스윙 관련 여러 스레드가 동시에 하나의 스윙 컴포넌트에 접근해서 데이터를 조작하는 것을 막기 위해,
-  기존에 진행중인 작업과 스레드에서의 작업을 분리하여 처리
-  효율성을 위해 계산에서 저장된 결과를 사용하여 하나의 invokeLater ()에서 모든 그리기 작업을 한 번에 수행해야합니다.
-- Frame 의 일부 panel 에 그래픽스 구현
+1. 스윙 이벤트 스레드의 중단 문제  
+게임 동작 화면에서 스윙 관련 여러 스레드가 동시에 하나의 스윙 컴포넌트에 접근해서 데이터를 조작하다보니  
+충돌 상황이 일어나 모든 스레드가 중단되는 어려움이 있었다.  
+--> invokeLater()을 사용하여 이벤트 처리 쓰레드로 이벤트들을 큐에 넣어 진행하고 있는 작업과 분리해서 실행시켜 해결하였다.  
+
+2. 단어 : 뜻이 1 : n 관계일 경우 다중 정답 처리 문제  
+사용자가 적은 답을 정답과 비교하려면 1:1 관계가 되어야 하는데, 다양한 답이 정답으로 처리될 수 있어야 하므로 어려움을 겪었다.  
+- 첫번째 시도
+```sql
+meaning LIKE '%answer%' 
+```
+
+
+
+2. Panel 에 더블 버퍼링으로 그래픽스 구현  
+더블 버퍼링을 구현하기 위하여 화면의 크기를 파라미터로 넘겨 주어야 보이지 않는 화면을 생성할 수 있는데,  
+Panel의 크기를 파라미터로 넘겨주는데에 어려움을 겪었다.
+
+단어가 생성되고, 움직일 그래픽을 Frame 전체가 아닌, 일부 panel에서 동작하는데에 어려움이 있었다. 
 - BGM으로 넣었던 음악이 frame 생성시마다 여러번 호출되는 문제
 - 단어: 뜻 이 1:n 관계일 경우 다중 정답 문제
 
