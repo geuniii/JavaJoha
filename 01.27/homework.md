@@ -11,7 +11,6 @@
   
   			String id = request.getParameter("id");
   			int writer = Integer.parseInt(request.getParameter("writer"));
-  			System.out.println("writer:" + writer + "currentUser.getId():" + currentUser.getId());
   
   			// 로그인해서 접근하지 않거나 작성자와 다를 경우
   			if (currentUser == null || currentUser.getId() != writer) {
@@ -166,8 +165,6 @@ case "/update": {
 			// GET방식
 			if ("GET".equals(request.getMethod())) {
 				int writer = Integer.parseInt(request.getParameter("writer"));
-				System.out.println("writer:" + writer + "currentUser.getId():" + currentUser.getId());
-				String bId = request.getParameter("id");
 				// 글 id 안넘어오면
 				if (bId == null || bId.isEmpty()) {
 					request.setAttribute("error_message", "invalid.parameter");
