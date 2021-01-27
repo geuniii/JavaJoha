@@ -1,6 +1,6 @@
-### 게시판 글 삭제 / 수정
+##게시판 글 삭제 / 수정
 
-#### 1. 삭제 
+### 1. 삭제 
 
 ![delete](https://user-images.githubusercontent.com/62981623/106024798-7a572c80-610b-11eb-8c3d-371b83828a57.jpg)
 
@@ -60,7 +60,7 @@
 
 
 
-#### 2. 수정
+### 2. 수정
 
 ![revise](https://user-images.githubusercontent.com/62981623/106023270-fe101980-6109-11eb-977e-1195beffdc5c.jpg)
 
